@@ -18,6 +18,7 @@ Firmware is C++ using the Arduino framework for ESP8266, built with PlatformIO (
 
 | Key | Define | Meaning |
 |-----|--------|---------|
+| `label` | `DEVICE_LABEL` | Name for this sensor, shown on the web page and in `/api/data` |
 | `wifi.ssid`, `wifi.password` | `WIFI_SSID`, `WIFI_PASSWORD` | WiFi credentials |
 | `network.use_static_ip` | `USE_STATIC_IP` | `true` = fixed address, `false` = DHCP |
 | `network.ip`, `gateway`, `subnet`, `dns` | `STATIC_IP`, `STATIC_GATEWAY`, `STATIC_SUBNET`, `STATIC_DNS` | Static addressing (parsed at boot) |
@@ -55,14 +56,14 @@ Served on `network.port` (default 80) at `network.ip` in `config/config.json`.
 
 ### `GET /api/data`
 ```json
-{"temperature_c":22.4,"temperature_f":72.3,"humidity_percent":41.7,
+{"label":"Living room","temperature_c":22.4,"temperature_f":72.3,"humidity_percent":41.7,
  "timestamp":"2026-10-06T14:03:11Z","timestamp_unix":1791295391}
 ```
-`timestamp` is ISO 8601 UTC; `timestamp_unix` is seconds since 1970. Both are `null` until NTP has synced.
+`label` is the `label` value from `config.json` (empty string if unset). `timestamp` is ISO 8601 UTC; `timestamp_unix` is seconds since 1970. Both are `null` until NTP has synced.
 Also includes `Access-Control-Allow-Origin: *`. Returns HTTP 503 with `{"error":"..."}` if no valid reading exists yet.
 
 ### `GET /`
-Basic HTML page with the same data (auto-refreshes every 10 s) and links to the JSON endpoints.
+Basic HTML page (the label is shown under the title) with the same data (auto-refreshes every 10 s) and links to the JSON endpoints.
 
 ### `GET /api/uptime`
 ```json

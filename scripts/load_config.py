@@ -10,6 +10,7 @@ with open(path) as f:
 
 net = cfg["network"]
 defines = [
+    ("DEVICE_LABEL", env.StringifyMacro(cfg.get("label", ""))),  # noqa: F821
     ("WIFI_SSID", env.StringifyMacro(cfg["wifi"]["ssid"])),  # noqa: F821
     ("WIFI_PASSWORD", env.StringifyMacro(cfg["wifi"]["password"])),  # noqa: F821
     ("USE_STATIC_IP", int(bool(net["use_static_ip"]))),

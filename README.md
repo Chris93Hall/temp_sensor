@@ -24,6 +24,7 @@ See [WIRING.md](WIRING.md) for how to connect the DHT22 to a bare ESP-12F or a N
 Edit `config/config.json`. It is read at build time by `scripts/load_config.py` and compiled into the firmware, so rebuild and re-flash after changing it. The WiFi password is stored in plain text in the firmware binary and in this file; don't commit or share either with real credentials.
 
 
+- `label` — a name for this sensor (e.g. "Living room"), shown on the web page and included in the `/api/data` JSON
 - `wifi.ssid`, `wifi.password`
 - `network.ip` — the IP address the web API serves from (with `gateway`, `subnet`, `dns`).
   Set `network.use_static_ip` to `false` to use DHCP instead (the address is printed on the serial monitor).

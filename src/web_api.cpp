@@ -26,8 +26,33 @@ static String isoTime(time_t t) {
   return String(buf);
 }
 
+static String jsonEscape(const char *s) {
+  String out;
+  for (; *s; s++) {
+    unsigned char c = *s;
+    if (c == '"' || c == '\\') { out += '\\'; out += (char)c; }
+    else if (c < 0x20) out += ' ';
+    else out += (char)c;
+  }
+  return out;
+}
+
+static String htmlEscape(const char *s) {
+  String out;
+  for (; *s; s++) {
+    switch (*s) {
+      case '&': out += "&amp;"; break;
+      case '<': out += "&lt;"; break;
+      case '>': out += "&gt;"; break;
+      case '"': out += "&quot;"; break;
+      default: out += *s;
+    }
+  }
+  return out;
+}
+
 static String readingJson() {
-  String j = "{";
+  String j = "{\"label\":\"" + jsonEscape(DEVICE_LABEL) + "\",";
   if (latest.valid) {
     j += "\"temperature_c\":" + String(latest.temperatureC, 1);
     j += ",\"temperature_f\":" + String(latest.temperatureC * 9.0f / 5.0f + 32.0f, 1);
@@ -59,6 +84,7 @@ static void handleHtml() {
                "table{width:100%;border-collapse:collapse}"
                "td{padding:.6em;border-bottom:1px solid #ddd}td+td{text-align:right;font-weight:bold}"
                "small{color:#777}</style></head><body><h1>Temperature &amp; Humidity</h1>");
+  if (DEVICE_LABEL[0]) h += "<h2>" + htmlEscape(DEVICE_LABEL) + "</h2>";
   if (latest.valid) {
     h += "<table><tr><td>Temperature</td><td>" + String(latest.temperatureC, 1) + " &deg;C / " +
          String(latest.temperatureC * 9.0f / 5.0f + 32.0f, 1) + " &deg;F</td></tr>";

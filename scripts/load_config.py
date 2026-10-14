@@ -20,6 +20,13 @@ defines = [
     ("WEB_PORT", int(net["port"])),
     ("DHT_PIN", int(cfg["sensor"]["pin"])),
     ("SENSOR_READ_INTERVAL_MS", int(cfg["sensor"]["read_interval_ms"])),
-    ("NTP_SERVER", env.StringifyMacro(cfg["ntp_server"])),  # noqa: F821
 ]
+
+# configTime() takes at most 3 servers; unused slots are empty strings.
+ntp = cfg["ntp_servers"]
+if not 1 <= len(ntp) <= 3:
+    raise ValueError("config.json: ntp_servers must list 1 to 3 servers")
+for i in range(3):
+    defines.append(("NTP_SERVER_%d" % (i + 1), env.StringifyMacro(ntp[i] if i < len(ntp) else "")))  # noqa: F821
+
 env.Append(CPPDEFINES=defines)  # noqa: F821

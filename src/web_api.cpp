@@ -4,6 +4,18 @@
 
 static ESP8266WebServer server;
 static Reading latest;
+// 64-bit uptime in ms. millis() is 32-bit and wraps every ~49.7 days, so count the wraps.
+// webApiHandle() calls updateUptime() on every loop pass, far more often than once per wrap.
+static uint64_t uptimeMs = 0;
+static uint32_t lastMillis = 0;
+
+static uint64_t updateUptime() {
+  uint32_t now = millis();
+  uptimeMs += (uint32_t)(now - lastMillis);  // unsigned subtraction is wrap-safe
+  lastMillis = now;
+  return uptimeMs;
+}
+
 static uint32_t rebootAt = 0;  // millis() deadline; 0 = no reboot pending
 
 static String isoTime(time_t t) {
@@ -67,10 +79,10 @@ static void handleHtml() {
 }
 
 static void handleUptime() {
-  unsigned long secs = millis() / 1000;  // millis() wraps after ~49 days
-  String j = "{\"uptime_seconds\":" + String(secs);
-  j += ",\"uptime_human\":\"" + String(secs / 86400) + "d " + String((secs / 3600) % 24) + "h " +
-       String((secs / 60) % 60) + "m " + String(secs % 60) + "s\"}";
+  uint64_t secs = updateUptime() / 1000;
+  String j = "{\"uptime_seconds\":" + String((unsigned long)secs);
+  j += ",\"uptime_human\":\"" + String((unsigned long)(secs / 86400)) + "d " + String((unsigned long)((secs / 3600) % 24)) + "h " +
+       String((unsigned long)((secs / 60) % 60)) + "m " + String((unsigned long)(secs % 60)) + "s\"}";
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "application/json", j);
 }
@@ -97,6 +109,7 @@ void webApiBegin(uint16_t port) {
 
 void webApiHandle() {
   server.handleClient();
+  updateUptime();
   if (rebootAt && (int32_t)(millis() - rebootAt) >= 0) ESP.restart();
 }
 void webApiUpdate(const Reading &r) { latest = r; }

@@ -55,8 +55,9 @@ void setup() {
   Serial.println();
   dht.begin();
   connectWifi();
-  // UTC. The fixed IP (Cloudflare time) works even if DNS lookups fail.
-  configTime(0, 0, NTP_SERVER, "time.google.com", "162.159.200.1");
+  // UTC. Servers come from config.json (1-3; unused slots are empty strings).
+  configTime(0, 0, NTP_SERVER_1, NTP_SERVER_2[0] ? NTP_SERVER_2 : nullptr,
+             NTP_SERVER_3[0] ? NTP_SERVER_3 : nullptr);
   webApiBegin(WEB_PORT);
   delay(1000);  // let the DHT22 settle after power-up
   sampleSensor();
@@ -74,7 +75,7 @@ void loop() {
       lastNtpLog = millis();
       IPAddress ntpIp;
       Serial.printf("Waiting for NTP... DNS=%s, resolve %s: %s\n", WiFi.dnsIP().toString().c_str(),
-                    NTP_SERVER, WiFi.hostByName(NTP_SERVER, ntpIp) ? ntpIp.toString().c_str() : "FAILED");
+                    NTP_SERVER_1, WiFi.hostByName(NTP_SERVER_1, ntpIp) ? ntpIp.toString().c_str() : "FAILED");
     }
   }
   if (millis() - lastRead >= SENSOR_READ_INTERVAL_MS) {

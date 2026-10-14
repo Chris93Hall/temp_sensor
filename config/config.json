@@ -1,0 +1,19 @@
+{
+  "wifi": {
+    "ssid": "not-set",
+    "password": "not-set"
+  },
+  "network": {
+    "use_static_ip": true,
+    "ip": "192.168.1.127",
+    "gateway": "192.168.1.1",
+    "subnet": "255.255.255.0",
+    "dns": "192.168.1.50",
+    "port": 80
+  },
+  "sensor": {
+    "pin": 4,
+    "read_interval_ms": 5000
+  },
+  "ntp_server": "pool.ntp.org"
+}
